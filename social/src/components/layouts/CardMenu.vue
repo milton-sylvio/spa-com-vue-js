@@ -1,12 +1,12 @@
 <template>
-    <div :class="'col s' + tamanho">
+    <div class="card-panel grey lighten-5 z-depth-1">
         <slot />
     </div>
 </template>
 
 <script>
 export default {
-  name: 'grid-colunas',
-  props: ['tamanho']
+  name: 'CardMenu',
+  props: []
 }
 </script>
