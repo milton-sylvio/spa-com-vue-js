@@ -3,13 +3,18 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import '@/assets/css/materialize.scss'
+import axios from 'axios'
 
 Vue.config.productionTip = false
+Vue.prototype.$http = axios
+Vue.prototype.$api = 'http://localhost:8000/api/'
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
+  render: h => h(App),
   components: { App },
   template: '<App/>'
 })

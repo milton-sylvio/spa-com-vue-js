@@ -1,103 +1,157 @@
 <template>
-    <site-template>
-        <div slot="menulateral">
-            <card-menu>
-                <div class="row valign-wrapper">
-                    <grid-colunas tamanho="4">
-                        <img src="https://materializecss.com/images/yuna.jpg" alt="" class="circle responsive-img">
-                    </grid-colunas>
-                    <grid-colunas tamanho="8">
-                        <span class="black-text">
-                            <h4>Maria Silva</h4>
-                            Add the "circle" class to it to make it appear circular.
-                        </span>
-                    </grid-colunas>
-                </div>
-            </card-menu>
+  <site-template>
+    <span slot="menuesquerdo">
+      <div class="valign-wrapper center-align">
+        <img :src="user.image" :alt="user.name" class="circle img-center z-depth-4 responsive-img"> <!-- notice the "circle" class -->
+      </div>
+    </span>
+
+    <span slot="conteudo">
+      <h2>Perfil</h2>
+
+      <div class="alerts alert-danger" v-show="errors_msg">
+        <ul class="errors-list" v-show="validator" v-for="(err, i) in errors" :key="i">
+          <li>{{err}}</li>
+        </ul>
+      </div>
+
+      <div class="input-field">
+        <input type="text" id="name" v-model="user.name">
+        <label for="name">Nome</label>
+      </div>
+      <div class="input-field">
+        <input type="email" id="email" v-model="user.email">
+        <label for="">E-mail</label>
+      </div>
+      <div class="file-field input-field">
+        <div class="btn">
+          <span>Selecionar uma imagem</span>
+          <input type="file" @change="previewFile">
         </div>
+        <div class="file-path-wrapper">
+          <input type="text" class="file-path validate">
+        </div>
+      </div>
+      <div class="input-field">
+        <input type="password" id="passw" v-model="user.password">
+        <label for="passw">Senha</label>
+      </div>
+      <div class="input-field">
+        <input type="password" id="password-confirmation " v-model="user.password_confirmation">
+        <label for="password-confirmation ">Confirmar senha</label>
+      </div>
 
-        <section slot="conteudos">
-          <h2>Perfil</h2>
-
-          <input type="text" placeholder="Nome" v-model="user.name">
-          <input type="email" placeholder="E-mail" v-model="user.email">
-          <input type="password" placeholder="Senha" v-model="user.password">
-          <input type="password" placeholder="Confirme sua senha" v-model="user.password_confirmation">
-          <button class="btn" @click="register()">Cadastrar</button>
-          <router-link class="waves-effect btn-flat" to="/login">Já tenho cadastro</router-link>
-        </section>
-
-        </section>
-    </site-template>
+      <button :class="'btn waves-light ' + disabled" @click="profile">
+        Atualizar
+        <i class="material-icons right">send</i>
+      </button>
+    </span>
+  </site-template>
 </template>
 
 <script>
+import SiteTemplate from '@/templates/SiteTemplate'
 import CardConteudo from '@/components/social/CardConteudo'
 import CardConteudoDetalhe from '@/components/social/CardConteudoDetalhe'
-import CardMenu from '@/components/layouts/CardMenu'
 import GridColunas from '@/components/layouts/GridColunas'
-import PublicarConteudo from '@/components/social/PublicarConteudo'
-import SiteTemplate from '@/templates/SiteTemplate'
 
 export default {
-  name: 'perfil',
+  name: 'Perfil',
   components: {
+    SiteTemplate,
     CardConteudo,
     CardConteudoDetalhe,
-    CardMenu,
-    GridColunas,
-    SiteTemplate
+    GridColunas
   },
   data () {
     return {
+      errors: [],
+      errors_msg: false,
+      validator: false,
+      loading: false,
+      disabled: '',
+      userSession: '',
       user: {
         name: '',
         email: '',
         password: '',
-        password_confirmation: ''
+        password_confirmation: '',
+        image: ''
       }
     }
   },
+  created () {
+    let sessionUser = sessionStorage.getItem('user')
+
+    if (sessionUser) {
+      this.userSession = JSON.parse(sessionUser)
+      this.user.name = this.userSession.name
+      this.user.email = this.userSession.email
+      this.user.image = this.userSession.image
+    } else {
+      this.$router.push('/login')
+    }
+  },
   methods: {
-    register () {
-      axios.post('http://localhost:8000/api/profile', {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        },
+    profile () {
+      this.disabled = 'disabled'
+      this.errors_msg = false
+
+      this.$http.put(`${this.$api}+profile`, {
         name: this.user.name,
         email: this.user.email,
+        image: this.user.image,
         password: this.user.password,
         password_confirmation: this.user.password_confirmation
-      })
+      }, {'headers': {'authorization': `Bearer ${this.userSession.token}`}})
         .then(response => {
-          if (response.data.token) { // Cadastro com sucesso
-            console.log('Cadastro efetuado com sucesso!')
-            sessionStorage.setItem('usuario', JSON.stringify(response.data))
-            this.$router.push('/')
-          } else if (response.data.status === false) { // Cadastro NÃO existente
-            console.log('Cadastro não existe!')
-            alert('Cadastro inválido!')
-          } else { // Erros de validação
-            console.log('Contém erros de validação!')
-            let erros = ''
+          if (response.data.status) {
+            console.log(response.data.user)
+            this.user = response.data.user
+            sessionStorage.setItem('user', JSON.stringify(this.user))
+            alert('Perfil atualizado!')
+          } else if (response.data.status === false && response.data.validation) {
+            // erros de validação
+            let error = []
 
-            for (let err of Object.values(response.data)) {
-              erros += `${err} `
-            }
+            this.errors = Object.values(response.data.errors).forEach(err => {
+              return error.push(err + '')
+            })
 
-            alert(erros)
+            this.errors = error
+            this.errors_msg = true
+            this.validator = true
+          } else {
+            // login inexistente
+            this.errors_msg = true
+            this.login_fail = true
+            this.disabled = ''
           }
-        })
-        .catch(error => {
-          this.errors.push(error)
-          console.log(error)
-          alert('Tente novamente mais tarde!')
-        })
 
-      // console.log('Mah Oooooooooooooieeee')
+          this.disabled = ''
+        })
+        .catch(e => {
+          console.log('Erros:', this.errors.push(e))
+          this.errors.push(e)
+          this.errors_msg = true
+          this.disabled = ''
+        })
+    },
+    previewFile (e) {
+      let file = e.target.files || e.dataTransfer.files
+
+      if (!file.length) {
+        return
+      }
+
+      let reader = new FileReader()
+
+      reader.onloadend = (r) => {
+        this.user.image = r.target.result
+      }
+
+      reader.readAsDataURL(file[0])
     }
   }
-
 }
 </script>

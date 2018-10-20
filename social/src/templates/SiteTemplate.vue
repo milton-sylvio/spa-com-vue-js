@@ -1,15 +1,18 @@
 <template>
   <span>
     <header>
-      <nav-bar logo="Rede Social" url="#/" cor="green darken-3">
-        <li>
-            <router-link to="/">Home</router-link>
-        </li>
-        <li>
+      <nav-bar logo="Rede Social" url="/" cor="teal lighten-2">
+        <li v-show="!user">
             <router-link to="/login">Entrar</router-link>
         </li>
-        <li>
+        <li v-show="!user">
           <router-link to="/cadastrar">Cadastre-se</router-link>
+        </li>
+        <li v-show="user">
+          <router-link to="/perfil">{{ user.name }}</router-link>
+        </li>
+        <li v-show="user">
+          <a @click="logout()">Sair</a>
         </li>
       </nav-bar>
     </header>
@@ -18,16 +21,18 @@
       <div class="container">
         <div class="row">
           <grid-colunas tamanho="4">
-            <slot name="menulateral" />
+            <aside class="sidebar-left">
+              <slot name="menuesquerdo" />
+            </aside>
           </grid-colunas>
           <grid-colunas tamanho="8">
-            <slot name="conteudos" />
+            <slot name="conteudo" />
           </grid-colunas>
         </div>
       </div>
     </main>
 
-    <footer-main cor="green dark-1" logo="Rede Social" descricao="Teste descrição" ano="2018">
+    <footer-main cor="teal lighten-2" logo="Rede Social" descricao="Teste descrição" ano="2018">
         <li><a class="grey-text text-lighten-3" href="/">Home</a></li>
         <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
         <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
@@ -47,6 +52,27 @@ export default {
     NavBar,
     FooterMain,
     GridColunas
+  },
+  data () {
+    return {
+      user: false
+    }
+  },
+  created () {
+    let sessionUser = sessionStorage.getItem('user')
+
+    if (sessionUser) {
+      this.user = JSON.parse(sessionUser)
+    } else {
+      this.$router.push('/login')
+    }
+  },
+  methods: {
+    logout () {
+      sessionStorage.clear()
+      this.user = false
+      this.$router.push('/login')
+    }
   }
 }
 </script>
