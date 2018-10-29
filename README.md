@@ -23,6 +23,10 @@ npm install axios
 # Para utilizar 
 import axios from 'axios'
 
+# VUEX (https://vuex.vuejs.org/ptbr/)
+########################################################
+npm install vuex --save
+
 ########################################################
 # API COM LARAVEL
 ########################################################
@@ -68,6 +72,9 @@ php artisan migrate
 
 # Para criar controllers
 php artisan make:controller UserController
+
+# Adicionar o TIMEZONE no config/app.php (linha 68)
+'timezone' => 'America/Sao_Paulo', 
 
 
 # CORS

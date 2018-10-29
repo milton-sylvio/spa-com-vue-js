@@ -31,7 +31,7 @@ class UserController extends Controller
         if (Auth::attempt([ 'email' => $data['email'], 'password' => $data['password'] ])) {
             $user = auth()->user();
             $user->token = $user->createToken($user->email)->accessToken;
-            $user->image = asset($user->image);
+            // $user->image = asset($user->image);
 
             return [
                 'status' => true,
@@ -70,7 +70,7 @@ class UserController extends Controller
         ]);
     
         $user->token = $user->createToken($user->email)->accessToken;
-        $user->image = asset($user->image);
+        // $user->image = asset($user->image);
     
         return [
             'status' => true,
@@ -169,8 +169,10 @@ class UserController extends Controller
             }
     
             if ($user->image) {
-                if (file_exists($user->image)) {
-                    unlink($user->image);
+                $imgUser = str_replace(asset('/'), '', $user->image);
+
+                if (file_exists($imgUser)) {
+                    unlink($imgUser);
                 }
             }
     
@@ -188,5 +190,13 @@ class UserController extends Controller
             'status' => true,
             'user' => $user
         ];
+    }
+
+    /**
+     * Get the content that owns the phone.
+     */
+    public function getImageAttribute($value)
+    {
+        return asset($value);
     }
 }

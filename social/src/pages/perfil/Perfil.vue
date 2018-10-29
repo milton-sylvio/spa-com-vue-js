@@ -2,7 +2,7 @@
   <site-template>
     <span slot="menuesquerdo">
       <div class="valign-wrapper center-align">
-        <img :src="user.image" :alt="user.name" class="circle img-center z-depth-4 responsive-img"> <!-- notice the "circle" class -->
+        <img :src="user.image" :alt="user.name" class="circle img-center z-depth-4 responsive-img img-profile"> <!-- notice the "circle" class -->
       </div>
     </span>
 
@@ -10,9 +10,11 @@
       <h2>Perfil</h2>
 
       <div class="alerts alert-danger" v-show="errors_msg">
-        <ul class="errors-list" v-show="validator" v-for="(err, i) in errors" :key="i">
-          <li>{{err}}</li>
+        <ul class="errors-list" v-if="validator && Array.isArray(errors)">
+          <li v-for="(err, i) in errors" :key="i">{{err}}</li>
         </ul>
+
+        <p v-else>{{errors}}</p>
       </div>
 
       <div class="input-field">
@@ -65,7 +67,7 @@ export default {
   },
   data () {
     return {
-      errors: [],
+      errors: '',
       errors_msg: false,
       validator: false,
       loading: false,
@@ -81,13 +83,12 @@ export default {
     }
   },
   created () {
-    let sessionUser = sessionStorage.getItem('user')
+    let session = this.$store.getters.getUser
 
-    if (sessionUser) {
-      this.userSession = JSON.parse(sessionUser)
-      this.user.name = this.userSession.name
-      this.user.email = this.userSession.email
-      this.user.image = this.userSession.image
+    if (session) {
+      this.user.name = session.name
+      this.user.email = session.email
+      this.user.image = session.image
     } else {
       this.$router.push('/login')
     }
@@ -97,22 +98,25 @@ export default {
       this.disabled = 'disabled'
       this.errors_msg = false
 
-      this.$http.put(`${this.$api}+profile`, {
+      this.$http.put(`${this.$api}profile`, {
         name: this.user.name,
         email: this.user.email,
         image: this.user.image,
         password: this.user.password,
         password_confirmation: this.user.password_confirmation
-      }, {'headers': {'authorization': `Bearer ${this.userSession.token}`}})
+      }, {'headers': {'authorization': `Bearer ${this.$store.getters.getToken}`}})
         .then(response => {
           if (response.data.status) {
             console.log(response.data.user)
             this.user = response.data.user
+            this.$store.commit('setUser', this.user)
             sessionStorage.setItem('user', JSON.stringify(this.user))
             alert('Perfil atualizado!')
           } else if (response.data.status === false && response.data.validation) {
             // erros de validação
             let error = []
+
+            this.errors = []
 
             this.errors = Object.values(response.data.errors).forEach(err => {
               return error.push(err + '')
@@ -125,14 +129,13 @@ export default {
             // login inexistente
             this.errors_msg = true
             this.login_fail = true
-            this.disabled = ''
           }
 
           this.disabled = ''
         })
         .catch(e => {
-          console.log('Erros:', this.errors.push(e))
-          this.errors.push(e)
+          console.log('Erros:', e)
+          this.errors = 'Erro no sistema! Por favor, tente mais tarde'
           this.errors_msg = true
           this.disabled = ''
         })
@@ -155,3 +158,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .img-profile {
+    max-width: 120px;
+  }
+</style>

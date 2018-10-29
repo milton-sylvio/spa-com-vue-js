@@ -59,16 +59,21 @@ export default {
     }
   },
   created () {
-    let sessionUser = sessionStorage.getItem('user')
+    let session = this.$store.getters.getUser
 
-    if (sessionUser) {
-      this.user = JSON.parse(sessionUser)
+    if (session) {
+      this.user = session
+      // this.user.name = session.name
+      // this.user.image = session.image
+      // this.user.token = session.token
+      // this.$router.push('/')
     } else {
       this.$router.push('/login')
     }
   },
   methods: {
     logout () {
+      this.$store.commit('setUser', null)
       sessionStorage.clear()
       this.user = false
       this.$router.push('/login')

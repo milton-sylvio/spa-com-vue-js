@@ -77,9 +77,10 @@ export default {
       }).then(response => {
         if (response.data.status) {
           // cadastro com sucesso
+          this.$store.commit('setUser', response.data.user)
           sessionStorage.setItem('user', JSON.stringify(response.data.user))
           this.$router.push('/')
-         } else if (response.data.status === false && response.data.validation) {
+        } else if (response.data.status === false && response.data.validation) {
           // erros de validação
           let error = []
 

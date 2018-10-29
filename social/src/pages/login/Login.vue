@@ -8,7 +8,7 @@
       <h1>Login</h1>
 
       <div class="alerts alert-danger" v-show="errors_msg">
-        <p v-show="login_fail">Login inexistente!</p>
+        <p v-show="login_fail">{{ msgError }}</p>
 
         <ul class="errors-list" v-show="validator" v-for="(err, i) in errors" :key="i">
           <li>{{err}}</li>
@@ -49,6 +49,7 @@ export default {
       validator: false,
       loading: false,
       login_fail: false,
+      msgError: '',
       disabled: '',
       user: {
         email: '',
@@ -69,6 +70,7 @@ export default {
         if (response.data.status) {
           // login com sucesso
           console.log('login com sucesso')
+          this.$store.commit('setUser', response.data.user)
           sessionStorage.setItem('user', JSON.stringify(response.data.user))
           this.$router.push('/')
         } else if (response.data.status === false && response.data.validation) {
@@ -82,17 +84,19 @@ export default {
           this.errors = error
           this.errors_msg = true
           this.validator = true
-          this.disabled = ''
         } else {
           // login inexistente
           this.errors_msg = true
           this.login_fail = true
-          this.disabled = ''
+          this.msgError = 'Login inexistente!'
         }
       }).catch(e => {
-        console.log(this.errors.push(e))
-        this.errors.push(e)
+        // console.log(this.errors.push(e))
+        this.msgError = 'Erro no sistema, por favor, tente mais tarde!'
+        this.login_fail = true
         this.errors_msg = true
+        this.disabled = ''
+      }).finally(() => {
         this.disabled = ''
       })
     }

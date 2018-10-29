@@ -20,6 +20,9 @@ Route::post('/register', 'UserController@register');
 Route::post('/login', 'UserController@login');
 Route::middleware('auth:api')->put('/profile', 'UserController@profile');
 
+Route::middleware('auth:api')->post('/content/add', 'ContentController@add');
+Route::middleware('auth:api')->get('/content/list', 'ContentController@list');
+
 Route::get('/testes', function() {
   $user = User::find(1);
   $user2 = User::find(2);

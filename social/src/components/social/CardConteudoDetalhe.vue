@@ -1,7 +1,7 @@
 <template>
   <span>
     <div v-if="img" class="card-image">
-      <img  :src="img">
+      <img :src="img">
       <span class="card-title">{{titulo || ''}}</span>
     </div>
 

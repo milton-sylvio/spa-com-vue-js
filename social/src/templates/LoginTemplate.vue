@@ -31,11 +31,17 @@ export default {
     }
   },
   created () {
-    let sessionUser = sessionStorage.getItem('user')
+    let session = this.$store.getters.getUser
 
-    if (sessionUser) {
-      this.user = JSON.parse(sessionUser)
+    if (session) {
+      console.log('tem session')
+      this.user = session.name
+      this.user.name = session.name
+      this.user.image = session.image
+      this.user.token = session.token
       this.$router.push('/')
+    } else {
+      this.$router.push('/login')
     }
   }
 }

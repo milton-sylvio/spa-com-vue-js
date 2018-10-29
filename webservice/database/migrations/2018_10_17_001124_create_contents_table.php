@@ -18,8 +18,8 @@ class CreateContentsTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('title');
-            $table->longText('text');
-            $table->string('image');
+            $table->longText('text')->nullable();
+            $table->string('image')->nullable();
             $table->string('link');
             $table->dateTime('date');
             $table->timestamps();
@@ -28,6 +28,7 @@ class CreateContentsTable extends Migration
 
     /**
      * Reverse the migrations.
+     * php artisan migrate:rollback
      *
      * @return void
      */

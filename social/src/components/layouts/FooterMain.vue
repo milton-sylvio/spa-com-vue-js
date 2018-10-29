@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row">
                 <div class="col l6 s12">
-                    <h5 class="white-text">{{logo || 'Social Rede'}}</h5>
+                    <h5 class="white-text">{{$store.getters.getFullName}}</h5>
                     <p class="grey-text text-lighten-4">{{descricao || 'Aqui vai a sua descrição'}}</p>
                 </div>
                 <div class="col l4 offset-l2 s12">
@@ -16,7 +16,7 @@
         </div>
         <div class="footer-copyright">
             <div class="container">
-                &reg; {{ano || '2018'}} Todos os direitos reservados - {{logo || 'Rede Social'}}
+                &reg; {{ano || '2018'}} Todos os direitos reservados - {{$store.getters.getName}}
                 <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
             </div>
         </div>

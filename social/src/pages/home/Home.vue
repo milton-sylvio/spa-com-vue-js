@@ -16,15 +16,14 @@
     <span slot="conteudo">
       <publicar-conteudo />
 
-      <card-conteudo
-        :perfil="user.image"
-        :nome="user.name"
-        data="13/01/18 13:30">
+      <card-conteudo v-for="item in contents" :key="item.id"
+        :perfil="item.user.image"
+        :nome="item.user.name"
+        :data="item.user.date">
           <card-conteudo-detalhe
-            img="http://materializecss.com/images/sample-1.jpg"
-            titulo=""
-            txt="I am a very simple card. I am good at containing small bits of information.
-            I am convenient because I require little markup to use effectively."  />
+            :img="item.image"
+            :titulo="item.title"
+            :txt="item.text" />
       </card-conteudo>
     </span>
   </site-template>
@@ -51,17 +50,33 @@ export default {
       user: {
         name: '',
         image: ''
-      }
+      },
+      contents: []
     }
   },
   created () {
-    let session = sessionStorage.getItem('user')
-    let userSession = false
+    let session = this.$store.getters.getUser
 
     if (session) {
-      userSession = JSON.parse(session)
-      this.user.name = userSession.name
-      this.user.image = userSession.image
+      this.user = session
+
+      this.$http.get(`${this.$api}content/list`, {
+        'headers': {
+          'authorization': `Bearer ${this.$store.getters.getToken}`
+        }
+      })
+        .then(response => {
+          console.log(response)
+
+          if (response.data.status) {
+            this.contents = response.data.contents.data
+          }
+        })
+        .catch(e => {
+          console.log('Erros:', e)
+        })
+        .finally(() => {
+        })
     }
   }
 }
