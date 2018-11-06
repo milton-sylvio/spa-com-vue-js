@@ -22,11 +22,20 @@ Route::middleware('auth:api')->put('/profile', 'UserController@profile');
 
 Route::middleware('auth:api')->post('/content/add', 'ContentController@add');
 Route::middleware('auth:api')->get('/content/list', 'ContentController@list');
+Route::middleware('auth:api')->put('/content/like/{id}', 'ContentController@like');
 
 Route::get('/testes', function() {
+  /* 
   $user = User::find(1);
   $user2 = User::find(2);
-  /* $user->contents()->create([
+
+  $contents = Content::all();
+
+  foreach($contents as $key => $value) {
+    $value->delete();
+  }
+
+  $user->contents()->create([
     'title' => 'Título do Conteúdo 3',
     'text' => 'Texto do conteúdo 32',
     'image' => 'url da imagem 3',

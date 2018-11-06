@@ -1,5 +1,13 @@
 <template>
   <div class="row">
+    <div class="alerts alert-danger" v-show="errors_msg">
+      <ul class="errors-list" v-if="validator && Array.isArray(errors)">
+        <li v-for="(err, i) in errors" :key="i">{{err}}</li>
+      </ul>
+
+      <p v-else>{{errors}}</p>
+    </div>
+
     <grid-colunas class="input-field" tamanho="12">
       <h5>O que está acontecendo?</h5>
 
@@ -8,6 +16,7 @@
       <input type="text" v-if="content.title && content.text" placeholder="Digite aqui o link" v-model="content.link">
       <input type="text" v-if="content.title && content.text" placeholder="Digite aqui a URL da imagem" v-model="content.image">
     </grid-colunas>
+
     <p class="right-align">
       <button v-if="content.title && content.text" @click="addContent()" class="btn waves-effect waves-light" tamanho="2 offset-s10">Publicar</button>
     </p>
@@ -25,6 +34,9 @@ export default {
   props: [],
   data () {
     return {
+      errors: '',
+      errors_msg: false,
+      validator: false,
       content: {
         title: '',
         text: '',
@@ -44,14 +56,42 @@ export default {
         'headers': {
           'authorization': `Bearer ${this.$store.getters.getToken}`
         }
-      }).then(response => {
-        if (response.data) {
-          console.log(response.data.contents)
-        }
-      }).catch(e => {
-        console.log(e)
-        alert('Tente mais tarde!')
       })
+        .then(response => {
+          if (response.data.status) {
+            console.log(response.data.contents)
+
+            this.content = {
+              title: '',
+              text: '',
+              link: '',
+              image: ''
+            }
+
+            this.$store.commit('setContentsTimeLine', response.data.contents.data)
+          } else if (response.data.status === false && response.data.validation) {
+            // erros de validação
+            let error = []
+
+            this.errors = []
+
+            this.errors = Object.values(response.data.errors).forEach(err => {
+              return error.push(err + '')
+            })
+
+            this.errors = error
+            this.errors_msg = true
+            this.validator = true
+          }
+        })
+        .catch(e => {
+          console.log('Erros:', e)
+          this.errors = 'Erro no sistema! Por favor, tente mais tarde'
+          this.errors_msg = true
+        })
+        .finally(() => {
+          this.disabled = ''
+        })
     }
   }
 }

@@ -16,13 +16,17 @@
     <span slot="conteudo">
       <publicar-conteudo />
 
-      <card-conteudo v-for="item in contents" :key="item.id"
-        :perfil="item.user.image"
-        :nome="item.user.name"
-        :data="item.user.date">
+      <card-conteudo v-for="item in contentList" :key="item.id"
+        :profileId="item.id"
+        :likes="item.total_likes"
+        :likedContent="item.liked_content"
+        :profile="item.user.image"
+        :name="item.user.name"
+        :date="item.date">
           <card-conteudo-detalhe
             :img="item.image"
-            :titulo="item.title"
+            :title="item.title"
+            :link="item.link"
             :txt="item.text" />
       </card-conteudo>
     </span>
@@ -49,9 +53,10 @@ export default {
     return {
       user: {
         name: '',
-        image: ''
-      },
-      contents: []
+        image: '',
+        link: '',
+        date: ''
+      }
     }
   },
   created () {
@@ -69,7 +74,7 @@ export default {
           console.log(response)
 
           if (response.data.status) {
-            this.contents = response.data.contents.data
+            this.$store.commit('setContentsTimeLine', response.data.contents.data)
           }
         })
         .catch(e => {
@@ -77,6 +82,11 @@ export default {
         })
         .finally(() => {
         })
+    }
+  },
+  computed: {
+    contentList () {
+      return this.$store.getters.getContentsTimeLine
     }
   }
 }
