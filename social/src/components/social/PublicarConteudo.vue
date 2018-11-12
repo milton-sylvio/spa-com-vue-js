@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="mt-50 row">
     <div class="alerts alert-danger" v-show="errors_msg">
       <ul class="errors-list" v-if="validator && Array.isArray(errors)">
         <li v-for="(err, i) in errors" :key="i">{{err}}</li>
@@ -8,29 +8,28 @@
       <p v-else>{{errors}}</p>
     </div>
 
-    <grid-colunas class="input-field" tamanho="12">
-      <h5>O que está acontecendo?</h5>
+    <div class="card">
+      <div class="card-content">
+        <h5>O que está acontecendo?</h5>
 
-      <input type="text" placeholder="Digite aqui o título" v-model="content.title">
-      <textarea v-model="content.text" v-if="content.title" placeholder="Digite aqui seu conteúdo" class="materialize-textarea"></textarea>
-      <input type="text" v-if="content.title && content.text" placeholder="Digite aqui o link" v-model="content.link">
-      <input type="text" v-if="content.title && content.text" placeholder="Digite aqui a URL da imagem" v-model="content.image">
-    </grid-colunas>
+        <div class="input-field">
+          <input type="text" placeholder="Digite aqui o título" v-model="content.title">
+          <textarea v-model="content.text" v-if="content.title" placeholder="Digite aqui seu conteúdo" class="materialize-textarea"></textarea>
+          <input type="text" v-if="content.title && content.text" placeholder="Digite aqui o link" v-model="content.link">
+          <input type="text" v-if="content.title && content.text" placeholder="Digite aqui a URL da imagem" v-model="content.image">
+        </div>
 
-    <p class="right-align">
-      <button v-if="content.title && content.text" @click="addContent()" class="btn waves-effect waves-light" tamanho="2 offset-s10">Publicar</button>
-    </p>
+        <p class="right-align">
+          <button v-if="content.title && content.text" @click="addContent()" class="btn waves-effect waves-light" tamanho="2 offset-s10">Publicar</button>
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import GridColunas from '@/components/layouts/GridColunas'
-
 export default {
   name: 'PublicarConteudo',
-  components: {
-    GridColunas
-  },
   props: [],
   data () {
     return {
@@ -101,5 +100,6 @@ export default {
 <style scoped>
   h5 {
     font-size: 14px;
+    margin-top: 0;
   }
 </style>

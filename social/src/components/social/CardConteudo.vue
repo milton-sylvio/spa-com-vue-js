@@ -1,69 +1,85 @@
 <template>
+  <div class="row">
+      <div class="card">
+        <div class="card-content">
+          <div class="row valign-wrapper">
+            <grid-colunas tamanho="1">
+              <router-link :to="`/pagina/${userId}/${$slug(name, {lower: true}, '-')}`">
+                <img :src="profile" :alt="name" class="circle responsive-img">
+              </router-link>
+            </grid-colunas>
+            <grid-colunas tamanho="11">
+              <router-link :to="`/pagina/${userId}/${$slug(name, {lower: true}, '-')}`" class="black-text">
+                <strong>{{name}}</strong>
+                <small>{{date}}</small>
+              </router-link>
+            </grid-colunas>
+          </div>
 
-<div class="row">
-    <div class="card">
-      <div class="card-content">
-        <div class="row valign-wrapper">
-          <grid-colunas tamanho="1">
-            <img :src="profile" :alt="name" class="circle responsive-img"> <!-- notice the "circle" class -->
-          </grid-colunas>
-          <grid-colunas tamanho="11">
-            <span class="black-text">
-              <strong>{{name}}</strong>
-              <small>{{formatDate(date)}}</small>
-            </span>
-          </grid-colunas>
+          <slot />
         </div>
 
-        <slot />
+        <div class="card-action">
+          <p>
+            <a role="button" @click="liked(profileId)">
+              <i class="material-icons">{{iconLike}}</i>
+              {{countLikes}}
+            </a>
 
+            <a role="button" @click="viewComments(profileId)">
+              <i class="material-icons">insert_comment</i>
+              {{comments.length}}
+            </a>
+          </p>
+
+          <div v-if="showComments" class="forms right-align">
+            <textarea v-model="textComment" placeholder="Digite seu comentário" class="materialize-textarea" minlength="3" maxlength="150"></textarea>
+            <button v-if="textComment" @click="comment(profileId)" class="waves-effect waves-light btn-small">
+              <i class="material-icons">send</i>
+            </button>
+          </div>
+
+          <ul class="collection" v-if="comments.length > 0">
+            <li class="collection-item avatar" v-for="item in comments" :key="item.id">
+              <img :src="item.user.image" alt="" class="circle" />
+              <span class="title">
+                {{item.user.name}}
+                <small>{{item.date}}</small>
+              </span>
+              <p>{{item.text}}</p>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="card-action">
-        <p>
-          <a role="button" @click="liked(profileId)">
-            <i class="material-icons">{{iconLike}}</i>
-            {{countLikes}}
-          </a>
-
-          <i class="material-icons">insert_comment</i>
-        </p>
-      </div>
-    </div>
-
-</div>
-
+  </div>
 </template>
 
 <script>
-import GridColunas from '@/components/layouts/GridColunas'
-
 export default {
   name: 'CardConteudo',
-  props: ['profileId', 'likes', 'likedContent', 'profile', 'name', 'date'],
-  components: {
-    GridColunas
-  },
+  props: ['profileId', 'likes', 'likedContent', 'comments', 'profile', 'name', 'date', 'userId'],
   data () {
     return {
       iconLike: this.likedContent ? 'favorite' : 'favorite_border',
       countLikes: this.likes,
+      textComment: '',
       errors: '',
       errors_msg: false,
-      validator: false
+      validator: false,
+      showComments: false,
+      listComments: this.all_comments || []
     }
   },
   methods: {
-    liked (profileId) {
-      this.$http.put(`${this.$api}content/like/${profileId}`, {}, {
+    liked (id) {
+      this.$http.put(`${this.$api}content/like/${id}`, {}, {
         'headers': {
           'authorization': `Bearer ${this.$store.getters.getToken}`
         }
       })
         .then(response => {
           if (response.data.status) {
-            this.iconLike = this.iconLike === 'favorite_border' ? 'favorite' : 'favorite_border'
-
-            this.countLikes = response.data.likes
+            // this.iconLike = this.iconLike === 'favorite_border' ? 'favorite' : 'favorite_border'
             this.$store.commit('setContentsTimeLine', response.data.list.contents.data)
           } else if (response.data.status === false && response.data.validation) {
             // erros de validação
@@ -86,35 +102,75 @@ export default {
           this.errors_msg = true
         })
     },
-    formatDate (date) {
-      let dh = date.split(' ')
-      let day = dh[0]
+    viewComments () {
+      this.showComments = !this.showComments
+    },
+    comment (id) {
+      this.$http.put(`${this.$api}content/comment/${id}`, {
+        text: this.textComment
+      }, {
+        'headers': {
+          'authorization': `Bearer ${this.$store.getters.getToken}`
+        }
+      })
+        .then(response => {
+          if (response.data.status) {
+            this.$store.commit('setContentsTimeLine', response.data.list.contents.data)
+            this.textComment = ''
+          } else if (response.data.status === false && response.data.validation) {
+            // erros de validação
+            let error = []
 
-      day = day.split('-')
-      day = `${day[2]}/${day[1]}/${day[0]}`
+            this.errors = []
 
-      let hour = dh[1]
+            this.errors = Object.values(response.data.errors).forEach(err => {
+              return error.push(err + '')
+            })
 
-      hour = hour.split(':')
-      hour = `${hour[0]}:${hour[1]}`
-
-      return `${day} - ${hour}`
+            this.errors = error
+            this.errors_msg = true
+            this.validator = true
+          }
+        })
+        .catch(e => {
+          console.log('Erros:', e)
+          this.errors = 'Erro no sistema! Por favor, tente mais tarde'
+          this.errors_msg = true
+        })
     }
   }
 }
 </script>
 
-<style scoped>
-  .card {
-    background-color: #f3f3f3;
-  }
+<style lang="scss">
+[role="button"] {
+  cursor: pointer;
+}
 
-  .card .black-text  strong {
+.card {
+  .black-text strong {
     display: block;
     line-height: 0.5;
   }
+}
 
-  [role="button"] {
-    cursor: pointer;
+.collection-item {
+  .avatar {
+    .title {
+      display: block;
+      line-height: 1.25;
+      margin-bottom: 15px;
+
+      small {
+        display: block;
+        font-size: 60%;
+        opacity: 0.65;
+      }
+    }
   }
+}
+
+.forms {
+  margin-bottom: 25px;
+}
 </style>

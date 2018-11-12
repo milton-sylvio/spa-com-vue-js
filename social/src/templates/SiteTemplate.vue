@@ -44,14 +44,12 @@
 <script>
 import NavBar from '@/components/layouts/NavBar'
 import FooterMain from '@/components/layouts/FooterMain'
-import GridColunas from '@/components/layouts/GridColunas'
 
 export default {
   name: 'SiteTemplate',
   components: {
     NavBar,
-    FooterMain,
-    GridColunas
+    FooterMain
   },
   data () {
     return {

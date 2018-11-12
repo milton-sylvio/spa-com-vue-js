@@ -49,8 +49,8 @@ export default {
 
 <style lang="scss">
 body, html {
-    height: 100%;
-    margin: 0;
+  height: 100%;
+  margin: 0;
 }
 
 .row,
@@ -68,6 +68,7 @@ body, html {
 }
 
 .login {
+  background-color: #fff;
   height: 100%;
   margin-left: -10px;
   box-sizing: border-box;

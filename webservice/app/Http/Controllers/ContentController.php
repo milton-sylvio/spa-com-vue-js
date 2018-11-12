@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Content;
+use App\User;
 
 class ContentController extends Controller
 {
@@ -52,6 +53,7 @@ class ContentController extends Controller
 
         foreach ($contents as $key => $content) {
             $content->total_likes = $content->likes()->count();
+            $content->all_comments = $content->comments()->with('user')->get();
 
             $liked = $user->likes()->find($content->id);
 
@@ -64,7 +66,7 @@ class ContentController extends Controller
         ];
     }
 
-    // Add Curtidas
+    // ADD CURTIDAS
     public function like($id, Request $request) 
     {
         $content = Content::find($id);
@@ -72,8 +74,6 @@ class ContentController extends Controller
         if ($content) {
             $user = $request->user();
             $user->likes()->toggle($content->id);
-            // return $content->likes()->count();
-            // return $content->likes();
 
             return [
                 'status' => true,
@@ -86,7 +86,79 @@ class ContentController extends Controller
                 'validation' => true, 
                 'errors' => 'Conteúdo inexistente!'
             ];
+        }
+    }
 
+    // ADD COMENTÁRIOS
+    public function comment($id, Request $request) 
+    {        
+        $data = $request->all();
+
+        // Validação
+        $validator = Validator::make($data, [
+            'text' => 'required',
+        ]);
+    
+        if ($validator->fails()) {
+            return [
+                'status' => false, 
+                'validation' => true, 
+                'errors' => $validator->errors()
+            ];
+        }
+
+        $content = Content::find($id);
+
+        if ($content) {
+            $user = $request->user();
+            $user->comments()->create([
+                'content_id' => $content->id,
+                'text' => $request->text,
+                'date' => date('Y-m-d H:i:s')
+            ]);
+
+            return [
+                'status' => true,
+                'list' => $this->list($request)
+            ];
+        } else {
+            return [
+                'status' => false, 
+                'validation' => true, 
+                'errors' => 'Conteúdo inexistente!'
+            ];
+        }
+    }
+
+     // PÁGINA DO USUÁRIO
+    public function page($id, Request $request)
+    {
+        $profile = User::find($id);
+
+        if ($profile) {
+            $contents = $profile->contents()->with('user')->orderBy('date', 'DESC')->paginate(5);
+            $user = $request->user();
+    
+            foreach ($contents as $key => $content) {
+                $content->total_likes = $content->likes()->count();
+                $content->all_comments = $content->comments()->with('user')->get();
+    
+                $liked = $user->likes()->find($content->id);
+    
+                $content->liked_content = ($liked) ? true : false;
+            }
+            
+            return [
+                'status' => true,
+                'contents' => $contents,
+                'userPage' => $profile
+            ];
+        } else {
+
+            return [
+                'status' => false,
+                'error' => 'Usuário não encontrado!'
+            ];
         }
     }
 }

@@ -30,4 +30,12 @@ class Comment extends Model
     {
         return $this->belongsTo('App\Content');
     }
+
+    /**
+     * Formatar a Data para PT-BR.
+     */
+    public function getDateAttribute($value)
+    {
+        return date('d/m/Y - H:i', strtotime($value));
+    }
 }

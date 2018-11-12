@@ -2,14 +2,16 @@
   <site-template>
     <div slot="menuesquerdo">
       <sidebar
-        :image="user.image"
-        :name="user.name"
-        :userid="user.id"
-        :url="user.id + '/' + $slug(user.name, {lower: true}, '-')" />
+        :image="userPage.image"
+        :name="userPage.name"
+        :userid="userPage.id"
+        :url="userPage.id + '/' + $slug(userPage.name, {lower: true}, '-')" />
     </div>
 
     <div slot="conteudo" v-scroll="handleScroll">
       <publicar-conteudo />
+
+      <alerts v-if="showAlert" :type="typeAlert" :msg="msgAlert" :showClose="false" />
 
       <card-conteudo v-for="item in contentList" :key="item.id"
         :profileId="item.id"
@@ -42,7 +44,7 @@ import CardConteudoDetalhe from '@/components/social/CardConteudoDetalhe'
 import PublicarConteudo from '@/components/social/PublicarConteudo'
 
 export default {
-  name: 'Home',
+  name: 'Pagina',
   components: {
     SiteTemplate,
     Preloader,
@@ -50,40 +52,55 @@ export default {
     CardConteudo,
     PublicarConteudo
   },
-  data () {
-    return {
-      user: {
-        name: '',
-        image: '',
-        link: '',
-        date: ''
-      },
-      nextPageUrl: null,
-      stopScroll: false,
-      loading: true
-    }
-  },
+  data: () => ({
+    user: {
+      name: '',
+      image: '',
+      link: '',
+      date: ''
+    },
+    userPage: {
+      name: '',
+      image: ''
+    },
+    nextPageUrl: null,
+    stopScroll: false,
+    loading: true,
+    showAlert: false,
+    typeAlert: '',
+    msgAlert: ''
+  }),
   created () {
     let session = this.$store.getters.getUser
 
     if (session) {
       this.user = session
 
-      this.$http.get(`${this.$api}content/list`, {
+      this.$http.get(`${this.$api}content/page/${this.$route.params.id}`, {
         'headers': {
           'authorization': `Bearer ${this.$store.getters.getToken}`
         }
       })
         .then(response => {
-          // console.log(response)
+          this.userPage = response.data.userPage
 
-          if (response.data.status && this.$route.name === 'home') {
-            this.$store.commit('setContentsTimeLine', response.data.contents.data)
-            this.nextPageUrl = response.data.contents.next_page_url
+          console.log(this.userPage.image)
+          if (response.data.contents.data.length === 0) {
+            this.showAlert = true
+            this.typeAlert = 'info'
+            this.msgAlert = 'O usuário não tem nenhum conteúdo'
+          } else {
+            if (response.data.status && this.$route.name === 'pagina') {
+              this.$store.commit('setContentsTimeLine', response.data.contents.data)
+              this.nextPageUrl = response.data.contents.next_page_url
+            }
           }
         })
         .catch(e => {
           console.log('Erros created:', e)
+          this.showAlert = true
+          this.typeAlert = 'error'
+          this.msgAlert = 'Erro no sistema, por favor, tente mais tarde!'
         })
         .finally(() => {
           this.loading = false
@@ -117,18 +134,24 @@ export default {
           }
         })
           .then(response => {
-            if (response.data.status && this.$route.name === 'home') {
+            if (response.data.status && this.$route.name === 'pagina') {
               this.$store.commit('setPaginationContentsTimeLine', response.data.contents.data)
               this.nextPageUrl = response.data.contents.next_page_url
+              this.userPage = response.data.userPage
               this.stopScroll = true
             }
           })
           .catch(e => {
             console.log('Erros:', e)
+            this.showAlert = true
+            this.typeAlert = 'error'
+            this.msgAlert = 'Erro no sistema, por favor, tente mais tarde!'
           })
           .finally(() => {
             this.loading = false
           })
+      } else {
+        this.loading = false
       }
     }
   }

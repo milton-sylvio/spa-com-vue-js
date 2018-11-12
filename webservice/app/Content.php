@@ -38,4 +38,12 @@ class Content extends Model
     {
         return $this->belongsToMany('App\User', 'likes', 'content_id', 'user_id');
     }
+
+    /**
+     * Formatar a Data para PT-BR.
+     */
+    public function getDateAttribute($value)
+    {
+        return date('d/m/Y - H:i', strtotime($value));
+    }
 }
