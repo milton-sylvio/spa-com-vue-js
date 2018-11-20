@@ -28,6 +28,8 @@ Route::middleware('auth:api')->put('/content/comment/{id}', 'ContentController@c
 
 Route::middleware('auth:api')->get('/content/page/{id}', 'ContentController@page');
 
+Route::middleware('auth:api')->post('/user/friend', 'UserController@friend');
+
 Route::get('/testes', function() {
   // Add Comentários
   /* $user = User::find(1);
@@ -60,8 +62,12 @@ Route::get('/testes', function() {
   return $user->contents;*/
 
   // Add Amigos
-  /* $user->curti()->toggle($user2);
-  return $user->friends; */
+  /* 
+  $user->friends()->attach($user2->id);
+  $user->friends()->detach($user2->id);
+  $user->friends()->toggle($user2->id);
+  return $user->friends; 
+  */
 
   // Add Curtidas
   /* $content = Content::find(1);

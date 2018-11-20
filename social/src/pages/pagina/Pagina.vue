@@ -2,10 +2,12 @@
   <site-template>
     <div slot="menuesquerdo">
       <sidebar
+        :id="userPage.id"
         :image="userPage.image"
         :name="userPage.name"
-        :userid="userPage.id"
-        :url="userPage.id + '/' + $slug(userPage.name, {lower: true}, '-')" />
+        :iduser.sync="userPage.id"
+        :profileId="user.id"
+        :url="userPage.id + '/' + $slug(userPage.name, {lower: true}, '-')">{{userPage.id}}</sidebar>
     </div>
 
     <div slot="conteudo" v-scroll="handleScroll">
@@ -54,12 +56,14 @@ export default {
   },
   data: () => ({
     user: {
+      id: '',
       name: '',
       image: '',
       link: '',
       date: ''
     },
     userPage: {
+      id: '',
       name: '',
       image: ''
     },
@@ -84,7 +88,8 @@ export default {
         .then(response => {
           this.userPage = response.data.userPage
 
-          console.log(this.userPage.image)
+          console.log('this.userPage.id:', this.userPage.id)
+
           if (response.data.contents.data.length === 0) {
             this.showAlert = true
             this.typeAlert = 'info'

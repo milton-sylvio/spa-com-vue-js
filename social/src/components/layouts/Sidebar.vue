@@ -20,8 +20,8 @@
           </router-link>
         </div>
         <div class="divider"></div>
-        <div class="section">
-          <button @click="follow(userid)" class="waves-effect waves-teal btn">
+        <div class="section" v-if="verifyIsShowBtn">
+          <button @click="follow()" :id="iduser" class="waves-effect waves-teal btn">
             <i class="material-icons right">thumb_up_alt</i>
             Seguir
           </button>
@@ -42,10 +42,50 @@
 <script>
 export default {
   name: 'Sidebar',
-  props: ['userid', 'image', 'name', 'url'],
+  props: ['iduser', 'image', 'name', 'url', 'profileId'],
+  data: () => ({
+    verifyIsShowBtn: this.iduser
+  }),
+  watch: {
+    iduser: function (val) {
+      if (val !== this.profileId) {
+        this.verifyIsShowBtn = val
+      }
+    }
+  },
   methods: {
-    follow (id) {
-      console.log('Clicou no follow')
+    friend () {
+      this.$http.post(`${this.$api}user/friend`, {id: this.iduser}, {
+        'headers': {
+          'authorization': `Bearer ${this.$store.getters.getToken}`
+        }
+      })
+        .then(response => {
+          if (response.data.status) {
+            console.log(response.data)
+          } else {
+            // erros de validação
+            console.log(response.data.error)
+            // let error = []
+
+            // this.errors = []
+            // this.errors = Object.values(response.data.errors).forEach(err => {
+            //   return error.push(err + '')
+            // })
+
+            this.errors = response.data.error
+            this.errors_msg = true
+            this.validator = true
+          }
+        })
+        .catch(e => {
+          console.log('Erros:', e)
+          this.errors = 'Erro no sistema! Por favor, tente mais tarde'
+          this.errors_msg = true
+        })
+    },
+    follow () {
+      this.friend()
     }
   }
 }

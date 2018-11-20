@@ -154,9 +154,7 @@ class UserController extends Controller
     
             $time = time();
             $dir = 'profiles';
-    
-            // $dirImg = $dir . DIRECTORY_SEPARATOR . 'profile_id_' . $user->id;
-            
+                
             $ext = substr($data['image'], 11, strpos($data['image'], ';') - 11);
     
             $urlImage = $dir . DIRECTORY_SEPARATOR . $time . '-profile_id-' . $user->id . '.' . $ext;
@@ -193,10 +191,35 @@ class UserController extends Controller
     }
 
     /**
-     * Get the content that owns the phone.
+     * Get URL src image.
      */
     public function getImageAttribute($value)
     {
         return asset($value);
+    }
+
+    /**
+     * Adicionar amigos.
+     */
+    public function friend(Request $request)
+    {
+        $user = $request->user();
+        $friend = User::find($request->id);
+
+        if ($friend && ($user->id !== $friend->id)) {
+            $user->friends()->toggle($friend->id);
+            // $user->friends()->attach($friend->id); // adicionar
+            // $user->friends()->detach($friend->id); // apagar
+            
+            return [
+                'status' => true,
+                'user' => $user->friends
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => 'Usuário inexistente!'
+            ];
+        }
     }
 }

@@ -4,7 +4,8 @@
       <sidebar
         :image="user.image"
         :name="user.name"
-        :userid="user.id"
+        :iduser="user.id"
+        :profileId="user.id"
         :url="user.id + '/' + $slug(user.name, {lower: true}, '-')" />
     </div>
 
@@ -53,6 +54,7 @@ export default {
   data () {
     return {
       user: {
+        id: '',
         name: '',
         image: '',
         link: '',
@@ -75,8 +77,6 @@ export default {
         }
       })
         .then(response => {
-          // console.log(response)
-
           if (response.data.status && this.$route.name === 'home') {
             this.$store.commit('setContentsTimeLine', response.data.contents.data)
             this.nextPageUrl = response.data.contents.next_page_url
