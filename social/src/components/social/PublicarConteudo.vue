@@ -20,7 +20,7 @@
         </div>
 
         <p class="right-align">
-          <button v-if="content.title && content.text" @click="addContent()" class="btn waves-effect waves-light" tamanho="2 offset-s10">Publicar</button>
+          <button v-if="content.title && content.text" @click="addContent()" class="btn waves-effect waves-light orange dark-2" tamanho="2 offset-s10">Publicar</button>
         </p>
       </div>
     </div>
@@ -58,8 +58,6 @@ export default {
       })
         .then(response => {
           if (response.data.status) {
-            console.log(response.data.contents)
-
             this.content = {
               title: '',
               text: '',

@@ -26,10 +26,14 @@ Vue.component('grid-colunas', GridColunas)
 
 const store = {
   state: {
+    project: 'undici',
     user: sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null,
     contentsTimeLine: []
   },
   getters: {
+    getProject: state => {
+      return state.project
+    },
     getUser: state => {
       return state.user
     },

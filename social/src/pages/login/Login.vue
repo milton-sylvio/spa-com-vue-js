@@ -25,7 +25,7 @@
         <label for="password">Senha</label>
       </div>
 
-      <button :class="'btn waves-light ' + disabled" @click="login">
+      <button :class="['btn waves-light orange dark-2 ', disabled]" @click="login">
         Entrar
         <i class="material-icons right">send</i>
       </button>
@@ -91,7 +91,7 @@ export default {
           this.msgError = 'Login inexistente!'
         }
       }).catch(e => {
-        // console.log(this.errors.push(e))
+        console.log(e)
         this.msgError = 'Erro no sistema, por favor, tente mais tarde!'
         this.login_fail = true
         this.errors_msg = true

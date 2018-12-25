@@ -4,7 +4,7 @@
       <grid-colunas tamanho="8">
         <section class="login-section">
           <header>
-            <h2>Rede Social</h2>
+            <h2 class="brand-logo login"><img :src="logo" :alt="['Logo ', $store.getters.getProject]"></h2>
           </header>
         </section>
       </grid-colunas>
@@ -19,6 +19,7 @@
 
 <script>
 import GridColunas from '@/components/layouts/GridColunas'
+import logo from '@/assets/img/logo-undici.svg'
 
 export default {
   name: 'LoginTemplate',
@@ -27,7 +28,8 @@ export default {
   },
   data () {
     return {
-      user: false
+      user: false,
+      logo: logo
     }
   },
   created () {
@@ -41,7 +43,7 @@ export default {
       this.user.token = session.token
       this.$router.push('/')
     } else {
-      this.$router.push('/login')
+      // this.$router.push('/login')
     }
   }
 }
@@ -74,34 +76,43 @@ body, html {
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
-}
 
-.login-section {
-  position: relative;
-  background-image: url(../assets/img/social-media.png);
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: cover;
-  height: 100%;
-  object-fit: contain;
-  padding: 4.7em 8%;
+  &-section {
+    position: relative;
+    background-image: url(../assets/img/social-media.png);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: cover;
+    height: 100%;
+    object-fit: contain;
+    padding: 4.7em 8%;
 
-  header {
-    h2 {
-      background-color: rgba(255, 255, 255, 0.95);
-      display: inline-block;
-      padding: 15px 25px;
-      text-transform: uppercase;
-      width: auto;
+    header {
+      h2 {
+        background-color: rgba(255, 255, 255, 0.95);
+        display: inline-block;
+        padding: 15px 25px;
+        text-transform: uppercase;
+        min-height: 80px;
+        width: auto;
+      }
+    }
+  }
+
+  &-forms {
+    padding: 50px;
+
+    h1 {
+      margin-bottom: 50px;
     }
   }
 }
 
-.login-forms {
-  padding: 50px;
-
-  h1 {
-    margin-bottom: 50px;
+.brand-logo {
+  &.login {
+    > img {
+      height: 80px;
+    }
   }
 }
 </style>

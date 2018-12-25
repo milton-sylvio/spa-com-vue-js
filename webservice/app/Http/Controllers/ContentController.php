@@ -48,8 +48,10 @@ class ContentController extends Controller
 
     public function list(Request $request)
     {
-        $contents = Content::with('user')->orderBy('date', 'DESC')->paginate(5);
         $user = $request->user();
+        $friends = $user->friends()->pluck('id');
+        $friends->push($user->id);
+        $contents = Content::whereIn('user_id', $friends)->with('user')->orderBy('date', 'DESC')->paginate(5);
 
         foreach ($contents as $key => $content) {
             $content->total_likes = $content->likes()->count();
@@ -120,6 +122,70 @@ class ContentController extends Controller
             return [
                 'status' => true,
                 'list' => $this->list($request)
+            ];
+        } else {
+            return [
+                'status' => false, 
+                'validation' => true, 
+                'errors' => 'Conteúdo inexistente!'
+            ];
+        }
+    }
+
+    // ADD CURTIDAS
+    public function likepage($id, Request $request) 
+    {
+        $content = Content::find($id);
+        
+        if ($content) {
+            $user = $request->user();
+            $user->likes()->toggle($content->id);
+
+            return [
+                'status' => true,
+                'likes' => $content->likes()->count(),
+                'list' => $this->page($content->user_id, $request)
+            ];
+        } else {
+            return [
+                'status' => false, 
+                'validation' => true, 
+                'errors' => 'Conteúdo inexistente!'
+            ];
+        }
+    }
+
+    // ADD COMENTÁRIOS
+    public function commentpage($id, Request $request) 
+    {        
+        $data = $request->all();
+
+        // Validação
+        $validator = Validator::make($data, [
+            'text' => 'required',
+        ]);
+    
+        if ($validator->fails()) {
+            return [
+                'status' => false, 
+                'validation' => true, 
+                'errors' => $validator->errors()
+            ];
+        }
+
+        $content = Content::find($id);
+
+        if ($content) {
+            $user = $request->user();
+            $user->comments()->create([
+                'content_id' => $content->id,
+                'text' => $request->text,
+                'date' => date('Y-m-d H:i:s')
+            ]);
+
+            return [
+                'status' => true,
+                'list' => $this->page($content->user_id, $request)
             ];
         } else {
             return [

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Undici'),
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +104,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY'),
+    'key' => env('APP_KEY', 'base64:5vC96BMIjT5l8HOQuHOz/hzM9qvYylK9kPcfVO/4cpQ='),
 
     'cipher' => 'AES-256-CBC',
 

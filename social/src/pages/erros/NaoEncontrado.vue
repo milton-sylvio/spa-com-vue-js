@@ -3,9 +3,9 @@
     <div class="container center-align">
       <h1>404</h1>
       <h2>Esta página não pode ser encontrada!</h2>
-      <p class="teal-text text-darken-3">Mas temos muitas outras páginas para você ver.</p>
+      <p class="white-text">Mas temos muitas outras páginas para você ver.</p>
 
-      <a href="/" class="waves-effect waves-light btn teal darken-4">
+      <a href="/" class="waves-effect waves-light btn orange darken-4">
         <i class="material-icons left">arrow_back</i>
         Voltar
       </a>
@@ -15,27 +15,37 @@
 
 <script>
 export default {
-  name: 'NaoEncontrado'
+  name: 'NaoEncontrado',
+  created () {
+    document.body.classList.add('not-found')
+  }
 }
 </script>
 
 <style lang="scss">
-$color-shadow-main: #009688;
-$color-shadow-secondary: #004d40;
+
+$color-shadow-main: #f57c00;
+$color-shadow-secondary: #e65100;
 
 html {
-  background-color: #4db6ac;
+  background-color: $color-shadow-main;
   background-image: url(../../assets/img/clouds.png);
   background-repeat: no-repeat;
   background-position: bottom center;
   height: 100%;
-  z-index: 99;
+  z-index: 101;
 }
 
 body,
 html {
   margin: 0;
   padding: 0;
+}
+
+body {
+  &.not-found {
+    background-color: transparent;
+  }
 }
 
 .page-error {

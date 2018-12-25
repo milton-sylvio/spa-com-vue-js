@@ -1,18 +1,18 @@
 <template>
   <span>
     <header>
-      <nav-bar logo="Rede Social" url="/" cor="teal lighten-2">
+      <nav-bar url="/" cor="white orange-text text-darken-2">
         <li v-show="!user">
-            <router-link to="/login">Entrar</router-link>
+            <router-link to="/login" class="grey-text">Entrar</router-link>
         </li>
         <li v-show="!user">
-          <router-link to="/cadastrar">Cadastre-se</router-link>
+          <router-link to="/cadastrar" class="grey-text">Cadastre-se</router-link>
         </li>
         <li v-show="user">
-          <router-link to="/perfil">{{ user.name }}</router-link>
+          <router-link to="/perfil" class="grey-text">{{ user.name }}</router-link>
         </li>
         <li v-show="user">
-          <a @click="logout()">Sair</a>
+          <a @click="logout()" class="grey-text"><i class="material-icons right">exit_to_app</i>Sair</a>
         </li>
       </nav-bar>
     </header>
@@ -32,11 +32,7 @@
       </div>
     </main>
 
-    <footer-main cor="teal lighten-2" logo="Rede Social" descricao="Teste descrição" ano="2018">
-        <li><a class="grey-text text-lighten-3" href="/">Home</a></li>
-        <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-        <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-        <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+    <footer-main cor="orange darken-2" logo="Rede Social" descricao="Teste descrição" ano="2018">
     </footer-main>
   </span>
 </template>
@@ -61,10 +57,6 @@ export default {
 
     if (session) {
       this.user = session
-      // this.user.name = session.name
-      // this.user.image = session.image
-      // this.user.token = session.token
-      // this.$router.push('/')
     } else {
       this.$router.push('/login')
     }

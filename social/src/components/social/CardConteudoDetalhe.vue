@@ -11,12 +11,13 @@
       </span>
     </div>
 
-    <div v-if="txt" class="card-content">
+    <div v-if="txt" class="card-content-text">
       <h4 v-if="img === null" class="card-title no-img">{{title || ''}}</h4>
-      {{txt}}
-      <p v-if="link !== null">
-        <a :href="link" :title="title" class="waves-effect waves-teal btn-flat btn-link" target="_blank">Saiba mais</a>
-      </p>
+
+      <span v-if="link !== null">
+        <a :href="link" :title="title" class="grey-text txt-linked" target="_blank">{{txt}}</a>
+      </span>
+      <span v-else  class="grey-text">{{txt}}</span>
     </div>
 
   </span>
@@ -25,23 +26,25 @@
 <script>
 export default {
   name: 'CardDetalhe',
-  props: ['img', 'title', 'link', 'txt'],
-  data () {
-    return {
-
-    }
-  }
+  props: ['img', 'title', 'link', 'txt']
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss">
 .no-img {
   margin-top: 0;
 }
 
-.btn-link {
-  color: #4db6ac;
-  margin-top: 15px;
+.card-content-text {
+  padding-top: 25px;
+
+  .txt-linked {
+    transition: opacity .5s ease;
+
+    &:hover,
+    &:focus {
+      opacity: .75;
+    }
+  }
 }
 </style>

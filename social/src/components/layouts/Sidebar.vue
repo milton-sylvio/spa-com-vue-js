@@ -2,7 +2,7 @@
   <aside>
     <div class="card card-user">
       <div class="card-content no-padding center-align">
-        <div class="username-dt teal lighten-2">
+        <div class="username-dt orange darken-2">
           <div class="usr-pic">
             <router-link :to="`/pagina/${url}`" class="usr-pic">
               <img :src="image" :alt="name" class="circle responsive-img">
@@ -19,73 +19,38 @@
             Ver Perfil
           </router-link>
         </div>
-        <div class="divider"></div>
-        <div class="section" v-if="verifyIsShowBtn">
-          <button @click="follow()" :id="iduser" class="waves-effect waves-teal btn">
-            <i class="material-icons right">thumb_up_alt</i>
-            Seguir
-          </button>
-        </div>
+        <slot name="follow" />
       </div>
     </div>
 
-    <div class="collection with-header">
-      <div class="collection-header"><h4>Amigos</h4></div>
-      <a href="#!" class="collection-item">Alvin</a>
-      <a href="#!" class="collection-item">Fulano</a>
-      <a href="#!" class="collection-item">Ciclano</a>
-    </div >
+    <h4 class="mt-50 sidebar-title">Seguindo</h4>
+    <ul class="collection collection-friends">
+      <slot name="friends" />
+    </ul >
 
+    <h4 class="mt-50 sidebar-title">Seguidores</h4>
+    <ul class="collection collection-friends">
+      <slot name="followers" />
+    </ul >
   </aside>
 </template>
 
 <script>
 export default {
   name: 'Sidebar',
-  props: ['iduser', 'image', 'name', 'url', 'profileId'],
+  props: ['image', 'name', 'url'],
   data: () => ({
-    verifyIsShowBtn: this.iduser
+    // verifyIsShowBtn: this.iduser
   }),
   watch: {
-    iduser: function (val) {
+    /* iduser: function (val) {
       if (val !== this.profileId) {
         this.verifyIsShowBtn = val
       }
-    }
+    } */
   },
   methods: {
     friend () {
-      this.$http.post(`${this.$api}user/friend`, {id: this.iduser}, {
-        'headers': {
-          'authorization': `Bearer ${this.$store.getters.getToken}`
-        }
-      })
-        .then(response => {
-          if (response.data.status) {
-            console.log(response.data)
-          } else {
-            // erros de validação
-            console.log(response.data.error)
-            // let error = []
-
-            // this.errors = []
-            // this.errors = Object.values(response.data.errors).forEach(err => {
-            //   return error.push(err + '')
-            // })
-
-            this.errors = response.data.error
-            this.errors_msg = true
-            this.validator = true
-          }
-        })
-        .catch(e => {
-          console.log('Erros:', e)
-          this.errors = 'Erro no sistema! Por favor, tente mais tarde'
-          this.errors_msg = true
-        })
-    },
-    follow () {
-      this.friend()
     }
   }
 }

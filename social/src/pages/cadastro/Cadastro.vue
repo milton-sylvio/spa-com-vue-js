@@ -31,7 +31,7 @@
         <label for="password-confirmation ">Confirmar senha</label>
       </div>
 
-      <button :class="'btn waves-light ' + disabled" @click="register">
+      <button :class="['btn waves-light orange dark-2 ', disabled]" @click="register">
         Cadastrar
         <i class="material-icons right">send</i>
       </button>

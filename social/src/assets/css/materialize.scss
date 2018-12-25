@@ -9107,6 +9107,10 @@ input[type=range]::-ms-thumb {
   }
 }
 
+[role="button"] {
+  cursor: pointer;
+}
+
 .sidebar-left {
   margin-top: 50px;
 }
@@ -9118,7 +9122,35 @@ input[type=range]::-ms-thumb {
 .mt-50 {
   margin-top: 50px;
 }
+.mb-50 {
+  margin-bottom: 50px;
+}
 
 .no-padding {
   padding: 0;
 }
+
+.sidebar-title {
+  font-size: 1.75rem;
+  display: inline-block;
+}
+
+.collection-friends {
+  a {
+    .title {
+      color: #000;
+
+      &:hover,
+      &:focus {
+        color: lighten(#000000, 15%);
+      }
+    }
+  }
+
+  .collection-item {
+    &.avatar {
+      min-height: 64px;
+    }
+  }
+}
+

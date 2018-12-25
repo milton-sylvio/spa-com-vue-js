@@ -213,7 +213,8 @@ class UserController extends Controller
             
             return [
                 'status' => true,
-                'user' => $user->friends
+                'friends' => $user->friends,
+                'followers' => $user->followers
             ];
         } else {
             return [
@@ -221,5 +222,50 @@ class UserController extends Controller
                 'error' => 'Usuário inexistente!'
             ];
         }
+    }
+
+    /**
+     * Listagem de amigos.
+     */
+    public function friendsList(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            return [
+                'status' => true,
+                'friends' => $user->friends,
+                'followers' => $user->followers,
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => 'Usuário inexistente!'
+            ];
+        }
+    }
+
+    /**
+     * Listagem de amigos na página do Usuario.
+     */
+    public function friendsPage($id, Request $request)
+    {
+        $user = User::find($id);
+        $userLogged = $request->user();
+
+        if ($user) {
+            return [
+                'status' => true,
+                'friends' => $user->friends,
+                'followers' => $user->followers,
+                'friendsOnline' => $userLogged->friends
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => 'Usuário inexistente!'
+            ];
+        }
+
     }
 }

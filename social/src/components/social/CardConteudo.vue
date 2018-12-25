@@ -21,12 +21,12 @@
 
         <div class="card-action">
           <p>
-            <a role="button" @click="liked(profileId)">
+            <a :id="profileId" @click="liked(profileId)" role="button">
               <i class="material-icons">{{iconLike}}</i>
               {{countLikes}}
             </a>
 
-            <a role="button" @click="viewComments(profileId)">
+            <a :id="profileId" @click="viewComments(profileId)" role="button">
               <i class="material-icons">insert_comment</i>
               {{comments.length}}
             </a>
@@ -34,7 +34,7 @@
 
           <div v-if="showComments" class="forms right-align">
             <textarea v-model="textComment" placeholder="Digite seu comentário" class="materialize-textarea" minlength="3" maxlength="150"></textarea>
-            <button v-if="textComment" @click="comment(profileId)" class="waves-effect waves-light btn-small">
+            <button v-if="textComment" @click="comment(profileId)" class="waves-effect waves-light orange dark-2 btn-small">
               <i class="material-icons">send</i>
             </button>
           </div>
@@ -72,15 +72,18 @@ export default {
   },
   methods: {
     liked (id) {
-      this.$http.put(`${this.$api}content/like/${id}`, {}, {
+      let url = this.$route.name === 'Home' ? 'like' : 'like-page'
+
+      this.$http.put(`${this.$api}content/${url}/${id}`, {}, {
         'headers': {
           'authorization': `Bearer ${this.$store.getters.getToken}`
         }
       })
         .then(response => {
           if (response.data.status) {
-            // this.iconLike = this.iconLike === 'favorite_border' ? 'favorite' : 'favorite_border'
+            this.countLikes = response.data.likes
             this.$store.commit('setContentsTimeLine', response.data.list.contents.data)
+            this.iconLike = this.iconLike === 'favorite_border' ? 'favorite' : 'favorite_border'
           } else if (response.data.status === false && response.data.validation) {
             // erros de validação
             let error = []
@@ -106,7 +109,9 @@ export default {
       this.showComments = !this.showComments
     },
     comment (id) {
-      this.$http.put(`${this.$api}content/comment/${id}`, {
+      let url = this.$route.name === 'Home' ? 'comment' : 'comment-page'
+
+      this.$http.put(`${this.$api}content/${url}/${id}`, {
         text: this.textComment
       }, {
         'headers': {
@@ -143,10 +148,6 @@ export default {
 </script>
 
 <style lang="scss">
-[role="button"] {
-  cursor: pointer;
-}
-
 .card {
   .black-text strong {
     display: block;

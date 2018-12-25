@@ -5,7 +5,8 @@
 <script>
 export default {
   name: 'app',
-  components: {
+  created () {
+    document.title = 'undici'
   }
 }
 </script>

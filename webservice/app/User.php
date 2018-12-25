@@ -64,6 +64,14 @@ class User extends Authenticatable
     /**
      * Get the content that owns the phone.
      */
+    public function followers()
+    {
+        return $this->belongsToMany('App\User', 'friends', 'friend_id', 'user_id');
+    }
+
+    /**
+     * Get the content that owns the phone.
+     */
     public function getImageAttribute($value)
     {
         return asset($value);
